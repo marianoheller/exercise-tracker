@@ -36,9 +36,35 @@ app.post('/api/exercise/new-user', (req, res) => {
 	
 })
 
+/**
+ * {"username":"qqqqqqqqqqqqqqq","description":"asd","duration":2,"_id":"rk64vGPZz","date":"Sat Nov 11 1111"}
+ */
 app.post('/api/exercise/add', (req, res) => {
-	//{"username":"qqqqq","description":"asd","duration":1,"_id":"SkY9Ux8WM","date":"Wed Nov 12 1231"}
-	res.sendStatus(200);
+	const { userId, description, duration, date } = req.body;
+	if ( !userId || !description || !duration || !date ) return res.status(400).send("Not enough parameters");
+	User.findById(userId, (err, user) => {
+		if(err) return res.status(400).send("User not found");
+		try {
+			var exercise = new Exercise({
+				username: user.username,
+				description: description,
+				duration: Number(duration),
+				date: Date(date),
+			});
+		} catch(err) {
+			return res.status(400).send(err.message);
+		}
+		exercise.save( (err) => {
+			if(err) return res.status(400).send(err.message);
+			return res.json({
+				username: exercise.username,
+				description: exercise.description,
+				duration: exercise.duration,
+				_id: exercise._id,
+				date: exercise.date
+			})
+		})
+	})
 })
 
 app.get('/api/exercise/log/:userId/:from?/:to?/:limit?', (req, res) => {
