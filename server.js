@@ -43,20 +43,21 @@ app.post('/api/exercise/add', (req, res) => {
 	const { userId, description, duration, date } = req.body;
 	if ( !userId || !description || !duration || !date ) return res.status(400).send("Not enough parameters");
 	User.findById(userId, (err, user) => {
-		if(err) return res.status(400).send("User not found");
+		if(err) return res.status(400).send(err.message);
 		try {
 			var exercise = new Exercise({
+
 				username: user.username,
 				userId: user._id,
 				description: description,
 				duration: Number(duration),
-				date: Date(date),
+				date: new Date(date),
 			});
 		} catch(err) {
-			return res.status(400).send(err.message);
+			return res.status(400).send("Error de try."+ err.message);
 		}
-		exercise.save( (err) => {
-			if(err) return res.status(400).send(err.message);
+		exercise.save( (error) => {
+			if(error) return res.status(400).send("Could not save."+ error.message);
 			return res.json({
 				username: exercise.username,
 				description: exercise.description,
@@ -71,8 +72,15 @@ app.post('/api/exercise/add', (req, res) => {
 app.get('/api/exercise/log?:userId/:from?/:to?/:limit?', (req, res) => {
 	var { userId, from, to, limit } = req.query;
 	if( !userId ) return res.status(400).send("userId required");
-	//Exercise.find( {userId: userId});
-	res.sendStatus(200);
+	Exercise.find( {userId: userId})
+	.where('from').gte( from ? new Date(from) : new Date(0))
+	.where('to').lte( to ? new Date(to) : new Date())
+	.limit( limit ? Number(limit) : 1E10)
+	.exec( (err, results) => {
+		if(err) return res.status(400).send(err.message);
+		console.log(results);
+		return res.sendStatus(200);
+	})
 })
 
 //=================================================================

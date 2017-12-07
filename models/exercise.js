@@ -2,14 +2,13 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
-var User = require("./user");
 
 var exerciseSchema = new Schema({
-    username: { type: String, required: true},
+    username: { type: String},
     userId: { type: String, required: true},
-    description: { type: String, required: true},
-    duration: { type: Number, required: true},
-    date: { type: Date, required: true}
+    description: { type: String},
+    duration: { type: Number},
+    date: { type: Date}
 });
 
 //VALIDATORS PARA FECHA, ETC
