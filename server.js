@@ -47,6 +47,7 @@ app.post('/api/exercise/add', (req, res) => {
 		try {
 			var exercise = new Exercise({
 				username: user.username,
+				userId: user._id,
 				description: description,
 				duration: Number(duration),
 				date: Date(date),
@@ -67,7 +68,10 @@ app.post('/api/exercise/add', (req, res) => {
 	})
 })
 
-app.get('/api/exercise/log/:userId/:from?/:to?/:limit?', (req, res) => {
+app.get('/api/exercise/log?:userId/:from?/:to?/:limit?', (req, res) => {
+	var { userId, from, to, limit } = req.query;
+	if( !userId ) return res.status(400).send("userId required");
+	//Exercise.find( {userId: userId});
 	res.sendStatus(200);
 })
 
